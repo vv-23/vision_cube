@@ -1,3 +1,5 @@
 .vscode/
 *.o
 Makefile
+*.exe
+cube.txt

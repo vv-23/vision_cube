@@ -2,22 +2,23 @@
 
 cv::Size threshold;
 
-Cube::Cube(cv::Mat frame) {
-    mWorkingFrame = frame;
-    mOriginalFrame = frame;
+Cube::Cube(cv::Mat frame, const std::string& filename) {
+    frame.copyTo(mWorkingFrame);
+    frame.copyTo(mOriginalFrame);
+    mParams.readFile(filename);
 }
 
 cv::Mat Cube::colorFilter(cv::Mat frame, Cube::filterMode mode) {
     cv::Mat ret;
     if (mode==filterMode::TOGRAY) {
-        cv::Scalar lowThreshold(0), highThreshold(255);
+        cv::Scalar lowThreshold(mParams.getValue("GRAY_LOW",-9001)), highThreshold(mParams.getValue("GRAY_HIGH", -9001));
         cv::Mat grayFrame, mask;
         cv::cvtColor(frame, grayFrame, CV_BGR2GRAY);
         cv::inRange(grayFrame, lowThreshold, highThreshold, mask);
         cv::bitwise_and(frame, frame, ret, mask);
     }
     if (mode==filterMode::TOHSV) {
-        cv::Scalar lowThreshold(20,100,80), highThreshold(30,255,230);
+        cv::Scalar lowThreshold(mParams.getValue("H_LOW",-9001),mParams.getValue("S_LOW",-9001),mParams.getValue("V_LOW",-9001)), highThreshold(mParams.getValue("H_HIGH",-9001),mParams.getValue("S_HIGH",-9001),mParams.getValue("V_HIGH",-9001));
         cv::Mat hsvFrame, mask;
         cv::cvtColor(frame, hsvFrame, CV_BGR2HSV);
         cv::inRange(hsvFrame, lowThreshold, highThreshold, mask);
@@ -36,18 +37,19 @@ std::vector<cv::KeyPoint> Cube::blobDetect(cv::Mat frame) {
     params.blobColor = 0;*/
     
     // Change thresholds
-    params.minThreshold = 80;
-    params.maxThreshold = 255;
+    params.minThreshold = mParams.getValue("BLOB_MIN_THRESHOLD", -9001);
+    params.maxThreshold = mParams.getValue("BLOB_MIN_THRESHOLD", -9001);
     
     // Filter by Area.
-    params.filterByArea = true;
-    params.minArea = 10;
+    params.filterByArea = mParams.getValue("FILTER_BY_AREA",-9001);
+    params.minArea = mParams.getValue("MIN_AREA",-9001);
     
     // Filter by Circularity
     /*params.filterByCircularity = true;
     params.minCircularity = 0.68;
     params.maxCircularity = 0.8;*/
     
+    params.minDistBetweenBlobs = mParams.getValue("MIN_DISTANCE_BETWEEN_BLOBS",-9001);
     // Filter by Convexity
     std::cout << params.minDistBetweenBlobs << std::endl;
     
@@ -57,7 +59,8 @@ std::vector<cv::KeyPoint> Cube::blobDetect(cv::Mat frame) {
 }
 
 int Cube::getPosition() {
-    mWorkingFrame = colorFilter(mOriginalFrame, filterMode::TOHSV);
+    cv::Mat filtered = colorFilter(mOriginalFrame, filterMode::TOHSV);
+    filtered.copyTo(mWorkingFrame);
     int ret;
     std::vector<cv::KeyPoint> keypoints = blobDetect(mWorkingFrame);
     cv::drawKeypoints(mWorkingFrame, keypoints, mOriginalFrame, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
