@@ -3,7 +3,7 @@
 
 
 int main() {
-    cv::VideoCapture capture(0);
+    cv::VideoCapture capture(1);
     while (1) {
 		
     //we can loop the video by re-opening the capture every time the video reaches its last frame
@@ -19,7 +19,9 @@ int main() {
     cv::Mat frame;
     //read first frame
     capture >> frame;
-    cv::imshow("Camera", frame);
+    Cube cube(frame);
+    cube.getPosition();
+    cv::imshow("Camera", cube.showFrame());
     cv::waitKey(10);
     
   }
