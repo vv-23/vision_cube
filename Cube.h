@@ -18,6 +18,7 @@ private:
     paramsInput mParams;
 public:
     Cube(cv::Mat frame, const std::string& filename = "parameters.txt");
+    Cube(cv::Mat frame, const paramsInput& params);
     int getPosition();
     cv::Mat showFrame();
 };

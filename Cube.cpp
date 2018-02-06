@@ -7,6 +7,11 @@ Cube::Cube(cv::Mat frame, const std::string& filename) {
     frame.copyTo(mOriginalFrame);
     mParams.readFile(filename);
 }
+Cube::Cube(cv::Mat frame, const paramsInput& params) {
+    mParams = params;
+    frame.copyTo(mWorkingFrame);
+    frame.copyTo(mOriginalFrame);
+}
 
 cv::Mat Cube::colorFilter(cv::Mat frame, Cube::filterMode mode) {
     cv::Mat ret;
