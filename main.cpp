@@ -20,10 +20,10 @@ int main(int argc, char **argv) {
   c.value = 1;	
   if(v4l2_ioctl(descriptor, VIDIOC_S_CTRL, &c) == 0)
     std::cout << "success";
-  c.id = V4L2_CID_EXPOSURE_AUTO_PRIORITY;
+  /*c.id = V4L2_CID_EXPOSURE_AUTO_PRIORITY;
   c.value = 0;
   if (v4l2_ioctl(descriptor, VIDIOC_S_CTRL, &c) == 0)
-    std::cout << "success";
+    std::cout << "success";*/
 
   c.id = V4L2_CID_EXPOSURE_ABSOLUTE;
   c.value = exposure;

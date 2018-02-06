@@ -23,8 +23,8 @@ cv::Mat Cube::colorFilter(cv::Mat frame, Cube::filterMode mode) {
         cv::cvtColor(frame, hsvFrame, CV_BGR2HSV);
         cv::inRange(hsvFrame, lowThreshold, highThreshold, mask);
         mBinaryImage = mask;
-        cv::bitwise_and(frame, frame, ret, mask);
-        cv::cvtColor(ret, ret, CV_BGR2GRAY);
+        cv::bitwise_not(mask, ret);
+        //cv::cvtColor(ret, ret, CV_BGR2GRAY);
     }
     return ret;
 }
@@ -51,7 +51,7 @@ std::vector<cv::KeyPoint> Cube::blobDetect(cv::Mat frame) {
     
     params.minDistBetweenBlobs = mParams.getValue("MIN_DISTANCE_BETWEEN_BLOBS",-9001);
     // Filter by Convexity
-    std::cout << params.minDistBetweenBlobs << std::endl;
+    //std::cout << params.minDistBetweenBlobs << std::endl;
     
     cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
     detector->detect(frame, keypoints);
