@@ -11,13 +11,16 @@
 class Cube {
 public:
     enum class filterMode {TOHSV, TOGRAY};
+    enum class detectionMode {BLOB, CONTOURS};
 private:
     cv::Mat mWorkingFrame, mOriginalFrame, mBinaryImage;
     cv::Mat colorFilter(cv::Mat frame, filterMode mode);
     std::vector<cv::KeyPoint> blobDetect(cv::Mat frame);
     paramsInput mParams;
+    std::vector<cv::Rect> Rects(cv::Mat frame);
 public:
     Cube(cv::Mat frame, const std::string& filename = "parameters.txt");
-    int getPosition();
+    Cube(cv::Mat frame, const paramsInput& params);
+    int getPosition(detectionMode mode);
     cv::Mat showFrame();
 };
