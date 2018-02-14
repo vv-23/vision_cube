@@ -75,7 +75,7 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
     cv::Canny(src, canny_output, mParams.getValue("CANNY_LOW_THRESHOLD", -9001), mParams.getValue("CANNY_HIGH_THRESHOLD", -9001));
     cv::Mat drawing = cv::Mat::zeros(canny_output.size(), CV_8U);
     cv::findContours(canny_output, edges, hierachy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE, cv::Point(0,0));
-    cv::Mat rectangles(cv::Size(frame.cols, frame.rows), CV_8U);
+    cv::Mat rectangles = cv::Mat(cv::Size(1280, 720), CV_8U);
     for (int i = 0; i<edges.size(); i++) {
         if (edges[i].size() > mParams.getValue("CONTOURS_MIN_LENGTH", -9001)) {
             cv::drawContours(drawing, edges, i, cv::Scalar(255), 1, 8, hierachy, 0);
@@ -88,7 +88,7 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
             bool valid = (r.area() > minArea) && (r.area() < maxArea) && (aspectRatio > minAspectRatio) && (aspectRatio < maxAspectRatio);
             if (valid) {
                 recs.push_back(r);
-                cv::rectangle(rectangles, cv::Rect(0,0,50,50), cv::Scalar(255), 1, 8, 0);
+                /*cv::rectangle(rectangles, r, cv::Scalar(255,255,255), 1, 8, 0);*/
             }
         }
     }
