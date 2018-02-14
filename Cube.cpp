@@ -67,12 +67,18 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
     cv::Mat src;
     frame.copyTo(src);
     std::vector<cv::Rect> recs;
-    cv::Mat contours_img;
+    cv::Mat contours_img, blurred;
     std::vector<std::vector<cv::Point>> edges;
-    /*cv::blur(src,src, cv::Size(3,3));
-    cv::Canny(src, edges, mParams.getValue("CANNY_LOW_THRESHOLD", -9001), mParams.getValue("CANNY_HIGH_THRESHOLD", -9001));
-    cv::drawContours(contours_img, edges, -1, cv::Scalar(255));
-    cv::imshow("Contours", contours_img);*/
+    cv::blur(src,src, cv::Size(3,3));
+    std::vector<cv::Vec4i> hierachy;
+    cv::Canny(src, contours_img, mParams.getValue("CANNY_LOW_THRESHOLD", -9001), mParams.getValue("CANNY_HIGH_THRESHOLD", -9001));
+    cv::findContours(contours_img, edges, hierachy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
+    cv::drawContours(contours_img, edges, -1, cv::Scalar(255), 1, 8, hierachy, 1);
+    cv::imshow("Contours", contours_img);
+    for(int i = 0; i<edges.size(); i++) {
+        cv::Rect temp = cv::boundingRect(cv::Mat(edges[i])); 
+        recs[i] = cv::Rect(temp);
+    }
     return recs;
 }
 

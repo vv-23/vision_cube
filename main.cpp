@@ -23,10 +23,10 @@ int main(int argc, char **argv) {
         cv::Mat frame;
         //read first frame
         capture >> frame;
-        if (frame.empty()) {
+        /*if (frame.empty()) {
           capture.release();
           capture = cv::VideoCapture(video_file);    
-        }
+        }*/
           
         Cube cube(frame, params);
         //std::cout << cube.getPosition() << std::endl;
