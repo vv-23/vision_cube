@@ -67,16 +67,17 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
     cv::Mat src;
     frame.copyTo(src);
     std::vector<cv::Rect> recs;
+    cv::Mat rectangles = cv::Mat(cv::Size(src.cols, src.rows), CV_8U, cv::Scalar(0,0,0));
     cv::Mat contours_img(cv::Size(mOriginalFrame.cols, mOriginalFrame.rows), CV_8U), blurred;
     std::vector<std::vector<cv::Point>> edges;
-    cv::blur(src, blurred, cv::Size(3,3));
+    //cv::blur(src, blurred, cv::Size(3,3));
     cv::Mat canny_output;
     std::vector<cv::Vec4i> hierachy;
     cv::Canny(src, canny_output, mParams.getValue("CANNY_LOW_THRESHOLD", -9001), mParams.getValue("CANNY_HIGH_THRESHOLD", -9001));
-    cv::Mat drawing = cv::Mat::zeros(canny_output.size(), CV_8U);
+    cv::Mat drawing = cv::Mat::zeros(src.size(), CV_8U);
     cv::findContours(canny_output, edges, hierachy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE, cv::Point(0,0));
-    cv::Mat rectangles = cv::Mat(cv::Size(1280, 720), CV_8U);
-    for (int i = 0; i<edges.size(); i++) {
+    int maxSize = 0; std::vector<cv::Point> *flag = &edges[0];
+    /*for (int i = 0; i<edges.size(); i++) {
         if (edges[i].size() > mParams.getValue("CONTOURS_MIN_LENGTH", -9001)) {
             cv::drawContours(drawing, edges, i, cv::Scalar(255), 1, 8, hierachy, 0);
             cv::Rect r = cv::boundingRect(edges[i]);
@@ -85,14 +86,32 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
             double minAspectRatio = mParams.getValue("RECTANGE_ASPECT_RATIO_MIN", -9001);
             double maxAspectRatio = mParams.getValue("RECTANGE_ASPECT_RATIO_MAX", -9001);
             double aspectRatio = r.width/r.height;
-            bool valid = (r.area() > minArea) && (r.area() < maxArea) && (aspectRatio > minAspectRatio) && (aspectRatio < maxAspectRatio);
+            bool valid = (r.area() > minArea) && (r.area() < maxArea) /*&& (aspectRatio > minAspectRatio) && (aspectRatio < maxAspectRatio);
             if (valid) {
                 recs.push_back(r);
-                /*cv::rectangle(rectangles, r, cv::Scalar(255,255,255), 1, 8, 0);*/
+                cv::rectangle(rectangles, r, cv::Scalar(255,255,255), 1, 8, 0);
             }
         }
+    }*/
+    for (int i = 0; i<edges.size(); i++) {
+        if (edges[i].size()>maxSize) {
+            maxSize = edges[i].size();
+            flag = &edges[i];
+        }
     }
-    //cv::imshow("Contours", drawing);
+    cv::drawContours(drawing, edges, std::find(edges.begin(), edges.end(), *flag)-edges.begin(), cv::Scalar(255), 1, 8, hierachy, 0);
+    cv::Rect r = cv::boundingRect(*flag);
+    double minArea = mParams.getValue("RECTANGLE_MIN_AREA", -9001);
+    double maxArea = mParams.getValue("RECTANGLE_MAX_AREA", -9001);
+    double minAspectRatio = mParams.getValue("RECTANGE_ASPECT_RATIO_MIN", -9001);
+    double maxAspectRatio = mParams.getValue("RECTANGE_ASPECT_RATIO_MAX", -9001);
+    double aspectRatio = r.width/r.height;
+    bool valid = (r.area() > minArea) && (r.area() < maxArea); /*&& (aspectRatio > minAspectRatio) && (aspectRatio < maxAspectRatio);*/
+    if (valid) {
+        recs.push_back(r);
+        cv::rectangle(rectangles, r, cv::Scalar(255,255,255), 1, 8, 0);
+    }
+    cv::imshow("Contours", drawing);
     cv::imshow("Rectangles", rectangles);
     return recs;
 }
@@ -119,10 +138,11 @@ int Cube::getPosition(detectionMode mode) {
         return ret;
     }
     if (mode==detectionMode::CONTOURS) {
-        cv::Mat filtered = colorFilter(mOriginalFrame, filterMode::TOHSV);
+        cv::Mat filtered;
+        colorFilter(mOriginalFrame, filterMode::TOHSV).copyTo(filtered);
         filtered.copyTo(mWorkingFrame);
         int ret;
-        Rects(mWorkingFrame);
+        Rects(filtered);
         return ret;
     }
 }

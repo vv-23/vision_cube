@@ -1,5 +1,5 @@
-LIBS =  `pkg-config --libs opencv libv4l2`
-CFLAGS = `pkg-config --cflags opencv libv4l2`
+LIBS =  `pkg-config --libs opencv`
+CFLAGS = `pkg-config --cflags opencv`
 CAMERATEST = `Camera_test.exe`
 CUBE = `Cube.exe`
 
