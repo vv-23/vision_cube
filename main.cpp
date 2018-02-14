@@ -20,9 +20,11 @@ int main(int argc, char **argv) {
         //check if the video has reach its last frame.
         //we add '-1' because we are reading two frames from the video at a time.
         //if this is not included, we get a memory error!
-        cv::Mat frame;
+        cv::Mat frame(cv::Scalar(capture.get(cv::CAP_PROP_FRAME_WIDTH), capture.get(cv::CAP_PROP_FRAME_HEIGHT)));
         //read first frame
         capture >> frame;
+        std::cout << frame.cols;
+        std::cout << frame.rows << std::endl;
         /*if (frame.empty()) {
           capture.release();
           capture = cv::VideoCapture(video_file);    

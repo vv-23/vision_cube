@@ -67,18 +67,33 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
     cv::Mat src;
     frame.copyTo(src);
     std::vector<cv::Rect> recs;
-    cv::Mat contours_img, blurred;
+    cv::Mat contours_img(cv::Size(mOriginalFrame.cols, mOriginalFrame.rows), CV_8U), blurred;
     std::vector<std::vector<cv::Point>> edges;
-    cv::blur(src,src, cv::Size(3,3));
+    cv::blur(src, blurred, cv::Size(3,3));
+    cv::Mat canny_output;
     std::vector<cv::Vec4i> hierachy;
-    cv::Canny(src, contours_img, mParams.getValue("CANNY_LOW_THRESHOLD", -9001), mParams.getValue("CANNY_HIGH_THRESHOLD", -9001));
-    cv::findContours(contours_img, edges, hierachy, CV_RETR_EXTERNAL, CV_CHAIN_APPROX_NONE);
-    cv::drawContours(contours_img, edges, -1, cv::Scalar(255), 1, 8, hierachy, 1);
-    cv::imshow("Contours", contours_img);
-    for(int i = 0; i<edges.size(); i++) {
-        cv::Rect temp = cv::boundingRect(cv::Mat(edges[i])); 
-        recs[i] = cv::Rect(temp);
+    cv::Canny(src, canny_output, mParams.getValue("CANNY_LOW_THRESHOLD", -9001), mParams.getValue("CANNY_HIGH_THRESHOLD", -9001));
+    cv::Mat drawing = cv::Mat::zeros(canny_output.size(), CV_8U);
+    cv::findContours(canny_output, edges, hierachy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE, cv::Point(0,0));
+    cv::Mat rectangles(cv::Size(frame.cols, frame.rows), CV_8U);
+    for (int i = 0; i<edges.size(); i++) {
+        if (edges[i].size() > mParams.getValue("CONTOURS_MIN_LENGTH", -9001)) {
+            cv::drawContours(drawing, edges, i, cv::Scalar(255), 1, 8, hierachy, 0);
+            cv::Rect r = cv::boundingRect(edges[i]);
+            double minArea = mParams.getValue("RECTANGLE_MIN_AREA", -9001);
+            double maxArea = mParams.getValue("RECTANGLE_MAX_AREA", -9001);
+            double minAspectRatio = mParams.getValue("RECTANGE_ASPECT_RATIO_MIN", -9001);
+            double maxAspectRatio = mParams.getValue("RECTANGE_ASPECT_RATIO_MAX", -9001);
+            double aspectRatio = r.width/r.height;
+            bool valid = (r.area() > minArea) && (r.area() < maxArea) && (aspectRatio > minAspectRatio) && (aspectRatio < maxAspectRatio);
+            if (valid) {
+                recs.push_back(r);
+                cv::rectangle(rectangles, cv::Rect(0,0,50,50), cv::Scalar(255), 1, 8, 0);
+            }
+        }
     }
+    //cv::imshow("Contours", drawing);
+    cv::imshow("Rectangles", rectangles);
     return recs;
 }
 
