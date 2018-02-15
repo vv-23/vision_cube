@@ -7,6 +7,8 @@ int main(int argc, char **argv) {
     std::string video_file(argv[2]);
     paramsInput params;
     params.readFile(params_file);
+    bool playVideo = true;
+    char key;
     while (1) {
       cv::VideoCapture capture(video_file);
       while(capture.get(CV_CAP_PROP_POS_FRAMES)<capture.get(CV_CAP_PROP_FRAME_COUNT)-1) {
@@ -17,26 +19,29 @@ int main(int argc, char **argv) {
           getchar();
           return -1;
         }
-        //check if the video has reach its last frame.
-        //we add '-1' because we are reading two frames from the video at a time.
-        //if this is not included, we get a memory error!
-        cv::Mat frame(cv::Scalar(capture.get(cv::CAP_PROP_FRAME_WIDTH), capture.get(cv::CAP_PROP_FRAME_HEIGHT)));
-        //read first frame
-        capture >> frame;
-        std::cout << frame.cols;
-        std::cout << frame.rows << std::endl;
-        /*if (frame.empty()) {
-          capture.release();
-          capture = cv::VideoCapture(video_file);    
-        }*/
-          
-        Cube cube(frame, params);
-        //std::cout << cube.getPosition() << std::endl;
-        cube.getPosition(Cube::detectionMode::CONTOURS);
-        //cv::imshow("Cube", cube.showFrame());
-        cv::imshow("Camera", frame);
-        //cv::imshow("Video", frame);
-        cv::waitKey(10);
+        if (playVideo) {
+          //check if the video has reach its last frame.
+          //we add '-1' because we are reading two frames from the video at a time.
+          //if this is not included, we get a memory error!
+          cv::Mat frame(cv::Scalar(capture.get(cv::CAP_PROP_FRAME_WIDTH), capture.get(cv::CAP_PROP_FRAME_HEIGHT)));
+          //read first frame
+          capture >> frame;
+          //std::cout << frame.cols;
+          //std::cout << frame.rows << std::endl;
+          /*if (frame.empty()) {
+            capture.release();
+            capture = cv::VideoCapture(video_file);    
+          }*/
+            
+          Cube cube(frame, params);
+          //std::cout << cube.getPosition() << std::endl;
+          cube.getPosition(Cube::detectionMode::CONTOURS);
+          //cv::imshow("Cube", cube.showFrame());
+          cv::imshow("Camera", frame);
+          //cv::imshow("Video", frame);
+        }
+        key = cv::waitKey(15);
+        if (key == 'p') playVideo = !playVideo;
         
       }
       capture.release();

@@ -68,6 +68,7 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
     frame.copyTo(src);
     std::vector<cv::Rect> recs;
     cv::Mat rectangles = cv::Mat(cv::Size(src.cols, src.rows), CV_8U, cv::Scalar(0,0,0));
+    cv::Mat groupedRectangles = cv::Mat(cv::Size(src.cols, src.rows), CV_8U, cv::Scalar(0,0,0));
     cv::Mat contours_img(cv::Size(mOriginalFrame.cols, mOriginalFrame.rows), CV_8U), blurred;
     std::vector<std::vector<cv::Point>> edges;
     //cv::blur(src, blurred, cv::Size(3,3));
@@ -77,7 +78,7 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
     cv::Mat drawing = cv::Mat::zeros(src.size(), CV_8U);
     cv::findContours(canny_output, edges, hierachy, cv::RETR_EXTERNAL, cv::CHAIN_APPROX_SIMPLE, cv::Point(0,0));
     int maxSize = 0; std::vector<cv::Point> *flag = &edges[0];
-    /*for (int i = 0; i<edges.size(); i++) {
+    for (int i = 0; i<edges.size(); i++) {
         if (edges[i].size() > mParams.getValue("CONTOURS_MIN_LENGTH", -9001)) {
             cv::drawContours(drawing, edges, i, cv::Scalar(255), 1, 8, hierachy, 0);
             cv::Rect r = cv::boundingRect(edges[i]);
@@ -86,14 +87,30 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
             double minAspectRatio = mParams.getValue("RECTANGE_ASPECT_RATIO_MIN", -9001);
             double maxAspectRatio = mParams.getValue("RECTANGE_ASPECT_RATIO_MAX", -9001);
             double aspectRatio = r.width/r.height;
-            bool valid = (r.area() > minArea) && (r.area() < maxArea) /*&& (aspectRatio > minAspectRatio) && (aspectRatio < maxAspectRatio);
+            bool valid = (r.area() > minArea) && (r.area() < maxArea);
             if (valid) {
                 recs.push_back(r);
                 cv::rectangle(rectangles, r, cv::Scalar(255,255,255), 1, 8, 0);
             }
         }
-    }*/
-    for (int i = 0; i<edges.size(); i++) {
+    }
+    for (auto i = recs.begin(); i!=recs.end(); i++) {
+        for (auto j = i+1; j!=recs.end(); j++) {
+            if (i!=j) {
+                cv::Rect intersect = ((*i) & (*j));
+                if (intersect.area()>0) {
+                    cv::Rect newRect = (*i) | (*j);
+                    std::replace(i,i+1,(*i), newRect);
+                    recs.erase(j);
+                }
+            }
+        }
+    } 
+    for (int i = 0; i<recs.size(); i++) {
+        cv::rectangle(groupedRectangles, recs[i], cv::Scalar(255,255,255));
+    }
+    
+    /*for (int i = 0; i<edges.size(); i++) {
         if (edges[i].size()>maxSize) {
             maxSize = edges[i].size();
             flag = &edges[i];
@@ -106,13 +123,14 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
     double minAspectRatio = mParams.getValue("RECTANGE_ASPECT_RATIO_MIN", -9001);
     double maxAspectRatio = mParams.getValue("RECTANGE_ASPECT_RATIO_MAX", -9001);
     double aspectRatio = r.width/r.height;
-    bool valid = (r.area() > minArea) && (r.area() < maxArea); /*&& (aspectRatio > minAspectRatio) && (aspectRatio < maxAspectRatio);*/
+    bool valid = (r.area() > minArea) && (r.area() < maxArea); /*&& (aspectRatio > minAspectRatio) && (aspectRatio < maxAspectRatio);
     if (valid) {
         recs.push_back(r);
         cv::rectangle(rectangles, r, cv::Scalar(255,255,255), 1, 8, 0);
-    }
+    }*/
     cv::imshow("Contours", drawing);
     cv::imshow("Rectangles", rectangles);
+    cv::imshow("Grouped", groupedRectangles);
     return recs;
 }
 
