@@ -20,6 +20,7 @@ private:
     std::vector<cv::KeyPoint> blobDetect(cv::Mat frame);
     paramsInput mParams;
     std::vector<cv::Rect> Rects(cv::Mat frame);
+    cv::Rect merge(const cv::Rect&, const cv::Rect&);
 public:
     Cube(cv::Mat frame, const std::string& filename = "parameters.txt");
     Cube(cv::Mat frame, const paramsInput& params);

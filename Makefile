@@ -11,5 +11,9 @@ Cube.o: Cube.cpp
 	g++ -g -c Cube.cpp -o Cube.o $(LIBS) $(CFLAGS)
 params_parser.o: params_parser.cpp
 	g++ -g -c params_parser.cpp -o params_parser.o
+record.exe: record.o params_parser.o
+	g++ -g -o record.exe record.o params_parser.o $(LIBS) $(CFAGS)
+record.o: record.cpp
+	g++ -g -c record.cpp -o record.o $(LIBS) $(CFLAGS)
 clean:
 	rm *.o *.exe

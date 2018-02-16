@@ -33,6 +33,15 @@ cv::Mat Cube::colorFilter(cv::Mat frame, Cube::filterMode mode) {
     return ret;
 }
 
+cv::Rect Cube::merge(const cv::Rect& a, const cv::Rect& b) {
+    cv::Rect r;
+    r.x = (a.x <= b.x) ? a.x:b.x;
+    r.y = (a.y <= b.y) ? a.y:b.y;
+    r.width = (a.width >= b.width) ? a.width:b.width;
+    r.height = (a.height >= b.height) ? a.height:b.height;
+    return r;
+}
+
 std::vector<cv::KeyPoint> Cube::blobDetect(cv::Mat frame) {
     cv::SimpleBlobDetector::Params params;
     std::vector<cv::KeyPoint> keypoints;                                                             
@@ -94,13 +103,13 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
             }
         }
     }
-    for (auto i = recs.begin(); i!=recs.end(); i++) {
-        for (auto j = i+1; j!=recs.end(); j++) {
+    for (auto i = recs.begin(); i<recs.end(); i++) {
+        for (auto j = recs.begin(); j<recs.end(); j++) {
             if (i!=j) {
                 cv::Rect intersect = ((*i) & (*j));
                 if (intersect.area()>0) {
-                    cv::Rect newRect = (*i) | (*j);
-                    std::replace(i,i+1,(*i), newRect);
+                    cv::Rect newRect = merge(*i, *j);
+                    *i = newRect;
                     recs.erase(j);
                 }
             }
