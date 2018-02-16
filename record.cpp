@@ -15,9 +15,9 @@ int main(int argc, char **argv) {
   int step = 0;
   int framecount = 0;
   std::stringstream ss;
-  ss << "frames/";
+  ss << "recorded_frames/";
   while(1) {
-    ss.str("frames/");
+    ss.str("recorded_frames/");
     if(!capture.isOpened()) {
       std::cout << "ERR OPENING CAMERA\n";
     }

@@ -41,16 +41,7 @@ bool paramsInput::readFile(const std::string &filename)
 				while (i < buffer.length() && (!isspace(buffer[i])))
 					valueString += buffer[i++];
 
-				try
-				{
-					value = std::stod(valueString);
-				}
-				catch(...)
-				{
-					std::cout << "cannot parse string '" << valueString << "' as a decimal" << std::endl ;
-					std::cout << "key is '" << Key << "'" << std::endl ;
-				}
-				mParamsMap.insert(std::pair<std::string, double>(Key, value));
+				mParamsMap.insert(std::pair<std::string, std::string>(Key, valueString));
 			}
 		}
 		ret = true ;
@@ -85,6 +76,14 @@ bool paramsInput::hasParam(const std::string &paramName)
 double paramsInput::getValue(const std::string &paramName, double defaultValue)
 {
     auto it = mParamsMap.find(paramName) ;
+    if (it == mParamsMap.end())
+		return defaultValue ;
+    
+    return std::stod((it->second));
+}
+
+std::string paramsInput::getString(const std::string &paramName, const std::string& defaultValue) {
+	auto it = mParamsMap.find(paramName) ;
     if (it == mParamsMap.end())
 		return defaultValue ;
     

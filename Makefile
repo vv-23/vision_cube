@@ -15,5 +15,9 @@ record.exe: record.o params_parser.o
 	g++ -g -o record.exe record.o params_parser.o $(LIBS) $(CFAGS)
 record.o: record.cpp
 	g++ -g -c record.cpp -o record.o $(LIBS) $(CFLAGS)
+slice.exe: slice.o
+	g++ -g -o slice.exe slice.o params_parser.o $(LIBS) $(CFLAGS)
+slice.o: slice_video.cpp
+	g++ -g -c slice_video.cpp -o slice.o $(LIBS) $(CFLAGS)
 clean:
 	rm *.o *.exe

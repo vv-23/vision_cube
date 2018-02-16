@@ -4,9 +4,10 @@
 
 int main(int argc, char **argv) {
     std::string params_file(argv[1]);
-    std::string video_file(argv[2]);
     paramsInput params;
     params.readFile(params_file);
+    //auto debug = params.getValue("CAMERA_EXPOSURE", -9001);
+    std::string video_file(params.getString("FILENAME", ""));
     bool playVideo = true;
     char key;
     while (1) {

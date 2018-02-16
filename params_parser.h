@@ -27,13 +27,20 @@ public:
     /// \return the parameter value from the parameter file, or defaultValue if the parameter did not exist in the file
     double getValue(const std::string &paramName, double defaultValue);
 
+    /// \brief gets the value of a parameter
+    /// and returns a default value if the parameter does not exist
+    /// \param paramName the name of the parameter we are searching for
+    /// \param defaultValue the value to return if the parameter did not exist in the parameter file
+    /// \return the parameter value from the parameter file, or defaultValue if the parameter did not exist in the file
+    std::string getString(const std::string &paramName, const std::string& defaultValue);
+
     /// \brief print the parameter values to the output stream given
     /// \param out the output stream to write the parameters to
     bool printMap(std::ostream &out);
     
 private:
     // the map that stores the parameter values
-    std::map<std::string, double> mParamsMap;
+    std::map<std::string, std::string> mParamsMap;
 
     // the name of the file read
     std::string mFilename;
