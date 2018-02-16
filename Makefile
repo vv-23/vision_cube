@@ -1,7 +1,8 @@
 LIBS =  `pkg-config --libs opencv`
+BOOSTPATH = -L/usr/local/lib/
+BOOSTLIBS = -lboost_filesystem -lboost_system
+DEBUG = /usr/local/lib/libboost_filesystem.a /usr/local/lib/libboost_system.a
 CFLAGS = `pkg-config --cflags opencv`
-CAMERATEST = `Camera_test.exe`
-CUBE = `Cube.exe`
 
 cube.exe: main.o Cube.o params_parser.o
 	g++ -g -o cube.exe main.o Cube.o params_parser.o $(LIBS) $(CFLAGS)
@@ -16,8 +17,8 @@ record.exe: record.o params_parser.o
 record.o: record.cpp
 	g++ -g -c record.cpp -o record.o $(LIBS) $(CFLAGS)
 slice.exe: slice.o
-	g++ -g -o slice.exe slice.o params_parser.o $(LIBS) $(CFLAGS)
+	g++ -g -o slice.exe slice.o params_parser.o $(LIBS) $(CFLAGS) $(DEBUG)
 slice.o: slice_video.cpp
-	g++ -g -c slice_video.cpp -o slice.o $(LIBS) $(CFLAGS)
+	g++ -g -c slice_video.cpp -o slice.o $(LIBS) $(CFLAGS) $(DEBUG)
 clean:
 	rm *.o *.exe

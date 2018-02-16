@@ -1,0 +1,3 @@
+FILENAME cube1.mp4
+INTERVAL 20 #frame ratio
+SAVEFOLDER sliced_frames/
