@@ -2,3 +2,7 @@
 *.o
 *.exe
 cube.txt
+*.jpg
+*.jpeg
+frames/
+sliced_frames

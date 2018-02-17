@@ -45,7 +45,7 @@ int main(int argc, char **argv) {
     //read first frame
     capture >> frame;
     Cube cube(frame, params);
-    cube.getPosition();
+    cube.getPosition(Cube::detectionMode::CONTOURS);
     cv::imshow("Cube", cube.showFrame());
     cv::imshow("Camera", frame);
     //cv::imshow("Video", frame);
