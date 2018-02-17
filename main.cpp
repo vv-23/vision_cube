@@ -38,7 +38,7 @@ int main(int argc, char **argv) {
           //std::cout << cube.getPosition() << std::endl;
           cube.getPosition(Cube::detectionMode::CONTOURS);
           //cv::imshow("Cube", cube.showFrame());
-          cv::imshow("Camera", frame);
+          //cv::imshow("Camera", frame);
           //cv::imshow("Video", frame);
         }
         key = cv::waitKey(15);

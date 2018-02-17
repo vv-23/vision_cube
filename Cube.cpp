@@ -100,6 +100,9 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
     int maxSize = 0; std::vector<cv::Point> *flag = &edges[0];
     for (int i = 0; i<edges.size(); i++) {
         if (edges[i].size() > mParams.getValue("CONTOURS_MIN_LENGTH", -9001)) {
+            std::vector<cv::Point> currentEdge = edges[i];
+            edges[i].clear(); //just to be safe
+            cv::convexHull(currentEdge, edges[i]);
             cv::drawContours(drawing, edges, i, cv::Scalar(255), 1, 8, hierachy, 0);
             cv::Rect r = cv::boundingRect(edges[i]);
             /*double minArea = mParams.getValue("RECTANGLE_MIN_AREA", -9001);
@@ -135,25 +138,25 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
                 if(valid(r)) recs.push_back(r);
             }
     };
-    /*for (int i = 0; i<recs.size(); i++) {
+    for (int i = 0; i<recs.size(); i++) {
         cv::rectangle(groupedRectangles, recs[i], cv::Scalar(255,255,255));
     };
     
     cv::imshow("Contours", drawing);
-    cv::imshow("Rectangles", rectangles);
-    cv::imshow("Grouped", groupedRectangles);*/
+    //cv::imshow("Rectangles", rectangles);
+    cv::imshow("Grouped", groupedRectangles);
     return recs;
 }
 
 cv::Mat Cube::paintTarget(const std::vector<cv::Rect>& r) {
     cv::Mat frame;
     mOriginalFrame.copyTo(frame);
-    int ymin = 1080;
+    int ymin = 0;
     cv::Point flag;
-    for (auto i = r.begin(); i<r.end(); i++) {
-        cv::Point center(i->x+i->width/2, i->y+i->height/2);
+    for (int i = 0; i<r.size(); i++) {
+        cv::Point center(r[i].x+r[i].width/2, r[i].y+r[i].height/2);
         int y = center.y;
-        if (y<ymin) {
+        if (y>ymin) {
             ymin = y;
             flag = center;
         }

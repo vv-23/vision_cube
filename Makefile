@@ -18,9 +18,9 @@ record.exe: record.o params_parser.o
 record.o: record.cpp
 	g++ -g -c record.cpp -o record.o $(LIBS) $(CFLAGS)
 slice.exe: slice.o
-	g++ -g -o slice.exe slice.o params_parser.o $(LIBS) $(CFLAGS) -L$(BOOSTPATH) $(BOOSTLIBS)
+	g++ -g -o slice.exe slice.o params_parser.o $(LIBS) $(CFLAGS)  $(BOOSTLIBS)
 slice.o: slice_video.cpp
-	g++ -g -c slice_video.cpp -o slice.o $(LIBS) $(CFLAGS) -L$(BOOSTPATH) $(BOOSTLIBS)
+	g++ -g -c slice_video.cpp -o slice.o $(LIBS) $(CFLAGS)  $(BOOSTLIBS)
 params_parser.o: params_parser.cpp
 	g++ -g -c params_parser.cpp -o params_parser.o
 clean:
