@@ -34,7 +34,7 @@ int main(int argc, char **argv) {
   c.value = exposure;
   if (v4l2_ioctl(descriptor, VIDIOC_S_CTRL, &c) == 0)
     std::cout << "success";
-  cv::VideoCapture capture(0);
+  cv::VideoCapture capture(params.getValue("CAMID", 0));
   while (1) {
     if (!capture.isOpened()) {
       std::cout << "ERROR ACQUIRING VIDEO FEED\n";
