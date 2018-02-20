@@ -65,7 +65,7 @@ std::vector<cv::KeyPoint> Cube::blobDetect(cv::Mat frame) {
     params.maxThreshold = mParams.getValue("BLOB_MAX_THRESHOLD", -9001);
     // Filter by Area.
     params.filterByArea = /*(mParams.getValue("FILTER_BY_AREA",-9001)==1)*/ true;
-    std::cout << params.filterByArea;
+    //std::cout << params.filterByArea;
     params.minArea = mParams.getValue("MIN_AREA",-9001);
     params.maxArea = mParams.getValue("MAX_AREA", -9001);
     
@@ -79,7 +79,7 @@ std::vector<cv::KeyPoint> Cube::blobDetect(cv::Mat frame) {
     //std::cout << params.minDistBetweenBlobs << std::endl;
     
     cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);
-    detector->detect(frame, keypoints);
+    detector->detect(frame, keypoints);//std::cout << keypoints.size() << std::endl;
     return keypoints;
 }
 
@@ -121,7 +121,7 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
     while (changed) {
             std::vector<cv::Rect> orig = recs;
             changed = false;
-            std::cout << orig.size() << std::endl;
+            //std::cout << orig.size() << std::endl;
             recs.clear();
             for (int i = 0; i<orig.size(); i++) {
                 cv::Rect r = orig[i];
@@ -129,7 +129,7 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
                 while (j<orig.size()) {
                     cv::Rect intersect = r & orig[j];
                     if (intersect.area()>0) {
-                        r = r | recs[j];
+                        r = merge(r, recs[j]);
                         orig.erase(orig.begin()+j);
                         changed = true;
                     }
@@ -143,7 +143,7 @@ std::vector<cv::Rect> Cube::Rects(cv::Mat frame) {
     };
     
     cv::imshow("Contours", drawing);
-    //cv::imshow("Rectangles", rectangles);
+    cv::imshow("Rectangles", rectangles);
     cv::imshow("Grouped", groupedRectangles);
     return recs;
 }
@@ -178,6 +178,7 @@ int Cube::getPosition(detectionMode mode) {
         int ret;
         std::vector<cv::KeyPoint> keypoints = blobDetect(filtered);
         cv::Mat im_with_keypoints;
+        std::cout << keypoints.size() << std::endl;
         cv::drawKeypoints(mWorkingFrame, keypoints, im_with_keypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );
         cv::imshow("Debug", im_with_keypoints);
         auto it = keypoints.begin();
