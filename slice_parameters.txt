@@ -1,3 +1,8 @@
-FILENAME negative2.MKV
-INTERVAL 90 #frame ratio
-SAVEFOLDER sliced_frames/
+FILENAME negative2.m4v
+INTERVAL 45 #frame ratio
+SAVEFOLDER rawdata/
+BATCH 1
+PREFIX positive
+FIRST 1
+LAST 3
+EXTENSION .mp4

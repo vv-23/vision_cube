@@ -9,4 +9,10 @@ sliced_frames/
 *.jpeg
 *.mkv
 *.MKV
-
+*.dll
+*.m4v
+*.mp4
+*.save
+*.swp
+rawdata/
+info.txt
